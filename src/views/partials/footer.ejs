@@ -1,0 +1,65 @@
+</main>
+<footer class="page-footer"
+    style="background: transparent; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 2rem;">
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script>
+    const token = sessionStorage.getItem('token');
+    const navLogin = document.getElementById('nav-login');
+    const navRegister = document.getElementById('nav-register');
+    const navDashboard = document.getElementById('nav-dashboard');
+    const navProfile = document.getElementById('nav-profile');
+    const navLogout = document.getElementById('nav-logout');
+    const linkDashboard = document.getElementById('link-dashboard');
+
+    if (token) {
+        navLogin.style.display = 'none';
+        navRegister.style.display = 'none';
+        navDashboard.style.display = 'block';
+        navProfile.style.display = 'block';
+        navLogout.style.display = 'block';
+
+        try {
+
+            const payloadBase64 = token.split('.')[1];
+            const decodedPayload = JSON.parse(atob(payloadBase64));
+            const roles = decodedPayload.roles || [];
+
+            if (roles.includes('admin')) {
+                linkDashboard.href = '/dashboard/admin';
+            } else {
+                linkDashboard.href = '/dashboard/user';
+            }
+        } catch (e) {
+            console.error("Invalid token format");
+            logout();
+        }
+    }
+
+    function logout() {
+        sessionStorage.removeItem('token');
+        window.location.href = '/signIn';
+    }
+
+    async function fetchWithAuth(url, options = {}) {
+        if (!token) {
+            window.location.href = '/signIn';
+            return;
+        }
+        if (!options.headers) options.headers = {};
+        options.headers['Authorization'] = 'Bearer ' + token;
+
+        const res = await fetch(url, options);
+        if (res.status === 401) {
+            M.toast({ html: 'Sesión expirada' });
+            logout();
+        }
+        if (res.status === 403) {
+            window.location.href = '/403';
+        }
+        return res;
+    }
+</script>
+</body>
+
+</html>

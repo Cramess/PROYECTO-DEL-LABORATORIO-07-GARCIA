@@ -1,0 +1,109 @@
+<%- include('partials/header') %>
+
+<div style="padding: 24px 0 60px; max-width: 600px; margin: 0 auto;">
+
+    <!-- Header del perfil -->
+    <div id="profile-loader" style="text-align:center; padding: 80px 0;">
+        <div class="preloader-wrapper active" style="width:40px;height:40px;">
+            <div class="spinner-layer spinner-blue-only">
+                <div class="circle-clipper left"><div class="circle"></div></div>
+                <div class="gap-patch"><div class="circle"></div></div>
+                <div class="circle-clipper right"><div class="circle"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="profile-content" style="display:none;">
+
+        <!-- Hero card del usuario -->
+        <div style="background:linear-gradient(135deg,rgba(88,86,214,0.4),rgba(10,132,255,0.3));border:1px solid rgba(255,255,255,0.15);border-radius:28px;padding:32px;text-align:center;margin-bottom:16px;backdrop-filter:blur(20px);">
+            <div style="position:relative;display:inline-block;margin-bottom:16px;">
+                <img id="p-img" src="" alt="Avatar" style="width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,0.2);">
+                <div style="position:absolute;bottom:0;right:0;width:28px;height:28px;background:#30d158;border-radius:50%;border:2px solid #000;display:flex;align-items:center;justify-content:center;">
+                    <i class="material-icons" style="font-size:0.85rem;color:#fff;">check</i>
+                </div>
+            </div>
+            <h2 id="p-name" style="margin:0;font-size:1.6rem;font-weight:800;letter-spacing:-0.04em;"></h2>
+            <p id="p-email" style="margin:6px 0 12px;color:rgba(255,255,255,0.55);font-size:0.95rem;"></p>
+            <span id="p-role" style="display:inline-block;padding:4px 14px;background:rgba(10,132,255,0.2);border:1px solid rgba(10,132,255,0.4);border-radius:20px;font-size:0.8rem;font-weight:600;color:#0a84ff;text-transform:uppercase;letter-spacing:0.06em;"></span>
+        </div>
+
+        <!-- Datos en tarjetas tipo iOS settings -->
+        <div style="background:rgba(28,28,32,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:24px;backdrop-filter:blur(20px);overflow:hidden;margin-bottom:16px;">
+            <div style="padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:space-between;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:34px;height:34px;background:rgba(10,132,255,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                        <i class="material-icons" style="font-size:1rem;color:#0a84ff;">phone</i>
+                    </div>
+                    <span style="font-size:0.9rem;color:rgba(255,255,255,0.5);">Teléfono</span>
+                </div>
+                <span id="p-phone" style="font-size:0.95rem;font-weight:500;color:#fff;"></span>
+            </div>
+            <div style="padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:space-between;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:34px;height:34px;background:rgba(255,149,0,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                        <i class="material-icons" style="font-size:1rem;color:#ff9500;">cake</i>
+                    </div>
+                    <span style="font-size:0.9rem;color:rgba(255,255,255,0.5);">Fecha de Nacimiento</span>
+                </div>
+                <span id="p-birth" style="font-size:0.95rem;font-weight:500;color:#fff;"></span>
+            </div>
+            <div style="padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:space-between;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:34px;height:34px;background:rgba(48,209,88,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                        <i class="material-icons" style="font-size:1rem;color:#30d158;">event_available</i>
+                    </div>
+                    <span style="font-size:0.9rem;color:rgba(255,255,255,0.5);">Edad</span>
+                </div>
+                <span id="p-age" style="font-size:0.95rem;font-weight:500;color:#fff;"></span>
+            </div>
+            <div style="padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:space-between;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:34px;height:34px;background:rgba(255,69,58,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                        <i class="material-icons" style="font-size:1rem;color:#ff453a;">home</i>
+                    </div>
+                    <span style="font-size:0.9rem;color:rgba(255,255,255,0.5);">Dirección</span>
+                </div>
+                <span id="p-address" style="font-size:0.95rem;font-weight:500;color:#fff;text-align:right;max-width:200px;"></span>
+            </div>
+            <div style="padding:14px 20px;display:flex;align-items:center;justify-content:space-between;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:34px;height:34px;background:rgba(88,86,214,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                        <i class="material-icons" style="font-size:1rem;color:#5856d6;">schedule</i>
+                    </div>
+                    <span style="font-size:0.9rem;color:rgba(255,255,255,0.5);">Miembro desde</span>
+                </div>
+                <span id="p-created" style="font-size:0.95rem;font-weight:500;color:#fff;"></span>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        if (!token) { window.location.href = '/signIn'; return; }
+        try {
+            const response = await fetchWithAuth('/api/users/me');
+            if (response && response.ok) {
+                const user = await response.json();
+                document.getElementById('p-name').textContent = `${user.name} ${user.lastName}`;
+                document.getElementById('p-email').textContent = user.email;
+                document.getElementById('p-phone').textContent = user.phoneNumber || 'N/A';
+                document.getElementById('p-birth').textContent = new Date(user.birthdate).toLocaleDateString('es-PE', { day:'2-digit', month:'long', year:'numeric' });
+                document.getElementById('p-age').textContent = `${user.age} años`;
+                document.getElementById('p-address').textContent = user.address || 'No especificada';
+                document.getElementById('p-created').textContent = new Date(user.createdAt).toLocaleDateString('es-PE', { day:'2-digit', month:'short', year:'numeric' });
+                document.getElementById('p-role').textContent = user.roles && user.roles.length ? user.roles.map(r => r.name).join(', ') : 'user';
+                const name = `${user.name}+${user.lastName}`;
+                document.getElementById('p-img').src = user.url_profile || `https://ui-avatars.com/api/?name=${name}&background=5856d6&color=fff&size=200`;
+                document.getElementById('profile-loader').style.display = 'none';
+                document.getElementById('profile-content').style.display = 'block';
+            }
+        } catch (err) {
+            M.toast({ html: 'Error al cargar el perfil' });
+        }
+    });
+</script>
+
+<%- include('partials/footer') %>

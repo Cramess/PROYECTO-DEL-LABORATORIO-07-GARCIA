@@ -1,0 +1,127 @@
+<%- include('partials/header') %>
+
+<div style="padding: 24px 0 60px;">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+        <div>
+            <p style="font-size:0.78rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin:0 0 4px;">Panel de Control</p>
+            <h1 style="font-size:2rem;font-weight:800;letter-spacing:-0.05em;margin:0;">Usuarios del sistema</h1>
+        </div>
+        <div id="admin-counter" style="background:rgba(10,132,255,0.15);border:1px solid rgba(10,132,255,0.3);border-radius:16px;padding:10px 20px;display:none;">
+            <span style="font-size:0.8rem;color:rgba(255,255,255,0.5);display:block;line-height:1;">Total</span>
+            <span id="user-count" style="font-size:1.5rem;font-weight:800;color:#0a84ff;line-height:1.2;">0</span>
+        </div>
+    </div>
+
+    <!-- Loader -->
+    <div id="admin-loader" style="text-align:center;padding:60px 0;">
+        <div class="preloader-wrapper active" style="width:40px;height:40px;">
+            <div class="spinner-layer spinner-blue-only">
+                <div class="circle-clipper left"><div class="circle"></div></div>
+                <div class="gap-patch"><div class="circle"></div></div>
+                <div class="circle-clipper right"><div class="circle"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users grid -->
+    <div id="admin-content" style="display:none;">
+        <div id="users-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;"></div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="userModal" class="modal" style="border-radius:24px;max-width:420px;margin:auto;top:50%;transform:translateY(-50%);">
+    <div class="modal-content" style="padding:28px;">
+        <h5 style="font-weight:800;letter-spacing:-0.04em;margin:0 0 20px;">Detalle del usuario</h5>
+        <div id="modal-user-content"></div>
+    </div>
+    <div class="modal-footer" style="padding:12px 20px;">
+        <a href="#!" class="modal-close" style="display:inline-block;padding:10px 20px;background:rgba(10,132,255,0.15);border:1px solid rgba(10,132,255,0.3);border-radius:12px;color:#0a84ff;font-weight:600;font-size:0.9rem;text-decoration:none;">Cerrar</a>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        M.Modal.init(document.querySelectorAll('.modal'));
+
+        try {
+            const response = await fetchWithAuth('/api/users');
+            if (response && response.ok) {
+                const users = await response.json();
+                const grid = document.getElementById('users-grid');
+
+                document.getElementById('user-count').textContent = users.length;
+                document.getElementById('admin-counter').style.display = 'block';
+
+                users.forEach(u => {
+                    const card = document.createElement('div');
+                    const imgUrl = u.url_profile || `https://ui-avatars.com/api/?name=${u.name}+${u.lastName}&background=5856d6&color=fff&size=80`;
+                    const roles = u.roles ? u.roles.map(r => r.name).join(', ') : 'user';
+                    const isAdmin = roles.includes('admin');
+
+                    card.style.cssText = 'background:rgba(28,28,32,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:22px;padding:20px;backdrop-filter:blur(20px);transition:all 0.2s;cursor:pointer;';
+                    card.onmouseover = () => { card.style.borderColor = 'rgba(10,132,255,0.4)'; card.style.transform = 'translateY(-2px)'; };
+                    card.onmouseout = () => { card.style.borderColor = 'rgba(255,255,255,0.1)'; card.style.transform = 'translateY(0)'; };
+                    card.innerHTML = `
+                        <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+                            <img src="${imgUrl}" alt="Avatar" style="width:52px;height:52px;border-radius:16px;object-fit:cover;flex-shrink:0;">
+                            <div style="overflow:hidden;">
+                                <p style="margin:0;font-weight:700;font-size:1rem;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${u.name} ${u.lastName}</p>
+                                <p style="margin:2px 0 0;font-size:0.82rem;color:rgba(255,255,255,0.45);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${u.email}</p>
+                            </div>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <div style="display:flex;gap:8px;align-items:center;">
+                                <span style="padding:3px 10px;border-radius:20px;font-size:0.75rem;font-weight:700;background:${isAdmin ? 'rgba(255,69,58,0.2)' : 'rgba(10,132,255,0.2)'};color:${isAdmin ? '#ff453a' : '#0a84ff'};text-transform:uppercase;letter-spacing:0.05em;">${roles}</span>
+                                <span style="font-size:0.78rem;color:rgba(255,255,255,0.35);">${u.age ? u.age + ' años' : ''}</span>
+                            </div>
+                            <button onclick='viewUser(${JSON.stringify(u).replace(/'/g, "&apos;")})' style="padding:6px 14px;background:rgba(255,255,255,0.08);border:none;border-radius:10px;color:rgba(255,255,255,0.7);font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.background='rgba(10,132,255,0.2)';this.style.color='#0a84ff'" onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.7)'">Ver más</button>
+                        </div>
+                        <p style="margin:12px 0 0;font-size:0.78rem;color:rgba(255,255,255,0.25);">Registrado el ${new Date(u.createdAt).toLocaleDateString('es-PE',{day:'2-digit',month:'short',year:'numeric'})}</p>
+                    `;
+                    grid.appendChild(card);
+                });
+
+                document.getElementById('admin-loader').style.display = 'none';
+                document.getElementById('admin-content').style.display = 'block';
+            }
+        } catch (err) {
+            console.error(err);
+            M.toast({ html: 'Error cargando usuarios' });
+        }
+    });
+
+    function viewUser(u) {
+        const imgUrl = u.url_profile || `https://ui-avatars.com/api/?name=${u.name}+${u.lastName}&background=5856d6&color=fff&size=120`;
+        const roles = u.roles ? u.roles.map(r => r.name).join(', ') : 'user';
+        document.getElementById('modal-user-content').innerHTML = `
+            <div style="text-align:center;margin-bottom:20px;">
+                <img src="${imgUrl}" alt="Avatar" style="width:80px;height:80px;border-radius:20px;object-fit:cover;margin-bottom:12px;">
+                <p style="margin:0;font-size:1.15rem;font-weight:800;color:#fff;">${u.name} ${u.lastName}</p>
+                <p style="margin:4px 0 0;font-size:0.85rem;color:rgba(255,255,255,0.4);">${u.email}</p>
+            </div>
+            <div style="background:rgba(255,255,255,0.05);border-radius:16px;overflow:hidden;">
+                ${[
+                    ['phone','Teléfono', u.phoneNumber || 'N/A', '#0a84ff'],
+                    ['cake', 'Nacimiento', new Date(u.birthdate).toLocaleDateString('es-PE',{day:'2-digit',month:'long',year:'numeric'}), '#ff9500'],
+                    ['event_available', 'Edad', (u.age ? u.age + ' años' : 'N/A'), '#30d158'],
+                    ['home', 'Dirección', u.address || 'N/A', '#ff453a'],
+                    ['shield', 'Roles', roles, '#5856d6'],
+                ].map(([icon,label,val,color],i,arr) => `
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;${i<arr.length-1?'border-bottom:1px solid rgba(255,255,255,0.06);':''}">
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <i class="material-icons" style="font-size:1rem;color:${color};">${icon}</i>
+                            <span style="font-size:0.88rem;color:rgba(255,255,255,0.5);">${label}</span>
+                        </div>
+                        <span style="font-size:0.9rem;font-weight:600;color:#fff;text-align:right;max-width:180px;">${val}</span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        M.Modal.getInstance(document.getElementById('userModal')).open();
+    }
+</script>
+
+<%- include('partials/footer') %>
