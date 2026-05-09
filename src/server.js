@@ -11,6 +11,20 @@ import path from 'path';
 
 dotenv.config();
 
+console.log('=== INICIANDO APP ===');
+
+process.on('uncaughtException', (err) => {
+    console.error('UNCAUGHT EXCEPTION:', err);
+});
+
+process.on('unhandledRejection', (err) => {
+    console.error('UNHANDLED REJECTION:', err);
+});
+
+console.log('PORT:', process.env.PORT);
+console.log('MONGODB_URI EXISTS:', !!process.env.MONGODB_URI);
+console.log('JWT_SECRET EXISTS:', !!process.env.JWT_SECRET);
+
 const app = express();
 
 // Configurar EJS
@@ -29,27 +43,58 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 
 // Validar estado del servidor
-app.get('/health', (req, res) => res.status(200).json({ ok: true }));
+app.get('/health', (req, res) => {
+    res.status(200).json({ ok: true });
+});
 
 // Rutas Web
 app.use('/', webRoutes);
 
 // Manejador global de errores
 app.use((err, req, res, next) => {
-    console.error(err);
-    res.status(err.status || 500).json({ message: err.message || 'Error interno del servidor' });
+
+    console.error('GLOBAL ERROR:', err);
+
+    res.status(err.status || 500).json({
+        message: err.message || 'Error interno del servidor'
+    });
+
 });
 
 const PORT = process.env.PORT || 3000;
 
-mongoose.connect(process.env.MONGODB_URI, { autoIndex: true })
-    .then( async () => {
-        console.log('Mongo connected');
+console.log('Conectando a MongoDB...');
+
+mongoose.connect(process.env.MONGODB_URI, {
+    autoIndex: true
+})
+.then(async () => {
+
+    console.log('Mongo connected');
+
+    try {
+
+        console.log('Ejecutando seedRoles...');
         await seedRoles();
+
+        console.log('Ejecutando seedUsers...');
         await seedUsers();
-        app.listen(PORT, () => console.log(`Servidor corriendo en el puerto ${PORT}`));
-    })
-    .catch(err => {
-        console.error('Error al conectar con Mongo:', err);
-        process.exit(1);
-    });
+
+        app.listen(PORT, () => {
+            console.log(`Servidor corriendo en el puerto ${PORT}`);
+        });
+
+    } catch (seedError) {
+
+        console.error('ERROR EN SEEDS:', seedError);
+
+    }
+
+})
+.catch(err => {
+
+    console.error('Error al conectar con Mongo:', err);
+
+    process.exit(1);
+
+});
